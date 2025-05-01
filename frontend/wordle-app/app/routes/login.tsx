@@ -1,5 +1,7 @@
 import { useEffect } from "react";
 import type { Route } from "./+types/login.ts";
+import { animate } from 'animejs';
+import { WordleAnim } from "~/wordle-anim/wordle-anim.js";
 
 
 export function meta({}: Route.MetaArgs) {
@@ -35,36 +37,43 @@ export default function Login() {
     // time for a sexy login page!
     return(
         <>
-            <div className="login-container flex flex-col items-start p-8 md:p-20 w-full md:w-1/2 min-h-screen bg-white">
-                <div className="wordle_splash italic">
-                    <label className="">
-                        Welcome to Rustle
-                    </label>
-                </div>
-                <div className="create-account mb-20">
-                    <label className="text-4xl font-bold">
-                        Create an Account
-                    </label>
-                </div>
-                <div className="login__login-box">
-                    <form>
-                    {/* username block */}
-                    <label className="block text-sm font-medium text-black pb-2">Username</label>
-                    <input type="text" id="username" className="bg-white border border-gray-300 text-sm rounded-lg block w-70 p-2.5 dark:placeholder-gray-400 " placeholder="skibidi@toilet.sigma" required />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+            <div className="container flex flex-row min-w-screen">
+                <div className="login-container flex flex-col items-center md:items-start p-8 md:p-20 w-full md:w-1/2 min-h-screen bg-white md:rounded-r-xl">
+                    <div className="wordle-splash italic">
+                        <label className="">
+                            Welcome to Rustle
+                        </label>
+                    </div>
+                    <div className="create-account mb-20">
+                        <label className="text-4xl font-bold">
+                            Create an Account
+                        </label>
+                    </div>
+                    <div className="login__login-box">
+                        <form>
+                        {/* username block */}
+                        <label className="block text-sm font-medium text-black pb-2">Username</label>
+                        <input type="text" id="username" className="bg-white border border-gray-300 text-sm rounded-lg block w-70 p-2.5 dark:placeholder-gray-400 " placeholder="skibidi@toilet.sigma" required />
 
-                    {/* password block */}
-                    <label className="block text-sm font-medium text-black pb-2 pt-10">Password</label>
-                    <input type="password" id="password" className="bg-white border border-gray-300 text-sm rounded-lg block w-70 p-2.5 dark:placeholder-gray-400" placeholder="Enter Password" required />
-                    </form>
+                        {/* password block */}
+                        <label className="block text-sm font-medium text-black pb-2 pt-10">Password</label>
+                        <input type="password" id="password" className="bg-white border border-gray-300 text-sm rounded-lg block w-70 p-2.5 dark:placeholder-gray-400" placeholder="Enter Password" required />
+                        </form>
+                    </div>
+                    <div className="flex rounded-2xl transition duration-300 ease-in-out hover:bg-green-700 text-white pt-3 pb-3 mt-5 w-70 justify-center bg-[#3cb53f]">
+                        <button className="w-full" onClick={handleLogin}>Continue</button>
+                    </div>
+                    <div className="flex w-70 justify-start">
+                        <a className="text-slate-400 mt-10 underline">Forgot Password?</a>
+                    </div>
                 </div>
-                <div className="flex rounded-2xl transition duration-300 ease-in-out hover:bg-green-700 text-white pt-3 pb-3 mt-5 w-70 justify-center bg-[#3cb53f]">
-                    <button className="w-full" onClick={handleLogin}>Continue</button>
+            {/* wordle demo anim */}
+                <div className="demo flex justify-center h-full w-full">
+                    <WordleAnim/>
                 </div>
-                <div className="flex w-70 justify-start">
-                    <a className="text-slate-400 mt-10 underline">Forgot Password?</a>
-                </div>
+
             </div>
-            
         </>
     )
 }
