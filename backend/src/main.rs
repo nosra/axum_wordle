@@ -1,7 +1,9 @@
-use axum::{Router, routing::get};
+use axum::routing;
+use axum::{Router, routing::get, routing::post};
+use axum::http::Method;
+use tower_http::cors::{Any, CorsLayer};
 use migration::{ Migrator, MigratorTrait }; 
-use sea_orm::{ ActiveModelTrait, ActiveValue, Database, DatabaseConnection, TryIntoModel };
-use sea_orm::ActiveValue::{Set, NotSet, Unchanged};
+use sea_orm::{ ActiveModelTrait, Database, DatabaseConnection };
 use serde_json::{self, json};
 use std::sync::Arc;
 use util::password::{check_password, generate_password};
@@ -14,8 +16,11 @@ use dotenvy::dotenv;
 // custom entities
 use entity::user;
 
+// custom controllers
+
 // custom utils
 mod util;
+mod controllers;
 
 
 // testing functions for our db
@@ -60,6 +65,7 @@ async fn init_db() -> Result<DatabaseConnection, sea_orm::DbErr> {
 }
 
 // shared state with the database connection
+#[derive(Clone)]
 struct AppState {
     database: DatabaseConnection,
 }
@@ -77,14 +83,21 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     Migrator::up(&db, None).await?;
 
     // generate shared state
-    let shared_state = Arc::new(AppState{
+    let shared_state = AppState {
         database: db.clone(),
-    });
+    };
+
+    // set up a cors layer
+    let cors = CorsLayer::new()
+        .allow_methods([Method::GET, Method::POST])
+        .allow_origin(Any);
 
     // creating an app
     let app = Router::new()
-        .route("/", get(|| async { "Hello, World!"}))
+        .route("/api/", get(|| async { "Hello, World!"}))
+        .route("/api/user/", post(controllers::user::post))
         .with_state(shared_state)
+        .layer(cors)
         ;
 
     // open up listener on :3000
