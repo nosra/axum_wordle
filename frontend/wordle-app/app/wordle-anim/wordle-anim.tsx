@@ -1,4 +1,4 @@
-import { animate, createTimeline, createTimer } from 'animejs';
+import { animate, createTimeline, createTimer, stagger } from 'animejs';
 import { forwardRef, useEffect, useRef, useState } from 'react';
 
 enum WordleColor {
@@ -6,6 +6,12 @@ enum WordleColor {
     Yellow,
     Green,
 }
+
+const COLORS = {
+    gray: '#6b7280',
+    yellow: '#eab308',
+    green: '#22c55e',
+  };
 
 // dummy wordbank -- this will be in the database
 const WORDBANK = [
@@ -16,12 +22,9 @@ const WORDBANK = [
     "flash",
 ]
 
-function Square({ className }: { className?: string }) {
-    return (
-      <button className={`w-20 h-20 bg-gray-700 rounded-2xl ${className}`} />
-    );
+function Square({ color }: { color: string }) {
+    return <button className="wordle-square w-20 h-20 rounded-2xl" style={{ backgroundColor: color }} />;
   }
-
 // function that returns a 3d matrix of a wordle board
 // each cell is coded with an enum
 function generateWordleColors(){
@@ -45,9 +48,13 @@ export function WordleAnim(){
     );
         
     useEffect(() => {
-        animate('.wordle-row:nth-child(1) .wordle-square:nth-child(1)', {
-            scale: [1, .5, 1]
-          });
+        // just a simple stagger from gray to green
+        animate('.wordle-square', {
+        backgroundColor: [COLORS.gray, COLORS.green],
+        scale: [0.9, 1],
+        delay: stagger(100, { grid: [5, 6], from: 'first' }),
+        easing: 'easeInOutQuad'
+        });
     }, []);
 
     return (
@@ -57,7 +64,8 @@ export function WordleAnim(){
                 <div key={row} className="wordle-row flex flex-row gap-5">
                 {[...Array(5)].map((_, col) => (
                     <Square 
-                    key={col} className="wordle-square"
+                    key={col}
+                    color={COLORS.gray}
                     />
                 ))}
                 </div>
