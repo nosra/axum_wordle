@@ -38,7 +38,7 @@ export default function Login() {
     return(
         <>
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-            <div className="container flex flex-row min-w-screen">
+            <div className="container flex flex-col md:flex-row min-w-screen">
                 <div className="login-container flex flex-col items-center md:items-start p-8 md:p-20 w-full md:w-1/2 min-h-screen bg-white md:rounded-r-xl">
                     <div className="wordle-splash italic">
                         <label className="">
@@ -69,8 +69,14 @@ export default function Login() {
                     </div>
                 </div>
             {/* wordle demo anim */}
-                <div className="demo flex justify-center h-full w-full">
-                    <WordleAnim/>
+                <div className="demo flex flex-col justify-center align-baseline h-lvh w-full">
+                    <div className="demo__splash-test flex justify-center">
+                        <label className="text-white text-4xl relative bottom-5">Try millions of Rustle Boards!</label>
+                    </div>
+                    <div className="flex justify-center align-center">
+                        <WordleAnim/>
+                    </div>
+                    
                 </div>
 
             </div>
