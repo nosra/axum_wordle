@@ -1,6 +1,5 @@
 import { useEffect } from "react";
 import type { Route } from "./+types/login.ts";
-import { animate } from 'animejs';
 import { WordleAnim } from "~/wordle-anim/wordle-anim.js";
 
 
@@ -71,7 +70,7 @@ export default function Login() {
             {/* wordle demo anim */}
                 <div className="demo flex flex-col justify-center align-baseline h-lvh w-full">
                     <div className="demo__splash-test flex justify-center">
-                        <label className="text-white text-4xl relative bottom-5">Try millions of Rustle Boards!</label>
+                        <label className="text-white text-4xl relative bottom-5">Play millions of Rustle Boards!</label>
                     </div>
                     <div className="flex justify-center align-center">
                         <WordleAnim/>

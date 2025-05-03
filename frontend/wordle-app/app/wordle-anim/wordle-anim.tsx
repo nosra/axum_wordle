@@ -1,5 +1,6 @@
-import { animate, createTimeline, createTimer, utils, stagger } from 'animejs';
-import { forwardRef, useEffect, useRef, useState } from 'react';
+import { gsap } from 'gsap';
+import { useGSAP } from '@gsap/react';
+import { useEffect, useRef, useState } from 'react';
 
 enum WordleColor {
     Gray,
@@ -15,176 +16,216 @@ const COLORS = [
     '#ffffff'
 ];
 
+// bunch of fake boards
+// just asked ChatGPT to do this... lol
 const fakeBoards = [
     {
-        guesses: [
-            "mount",
-            "chase",
-            "plier",
-            "bagel",
-            "cauld",
-            "caulk"
-        ],
-        solution: "caulk",
-    }
-]
+        guesses: ["climb", "spine", "shard", "shark", "sharp", "shape"],
+        solution: "shape",
+    },
+    {
+        guesses: ["crane", "brain", "grain", "grail", "grill", "grind"],
+        solution: "grind",
+    },
+    {
+        guesses: ["spear", "speak", "spend", "spine", "spite", "spilt"],
+        solution: "spilt",
+    },
+    {
+        guesses: ["sweep", "sweet", "sleet", "sheet", "sheep", "sheen"],
+        solution: "sheen",
+    },
+    {
+        guesses: ["stone", "stove", "shove", "shone", "shore", "short"],
+        solution: "short",
+    },
+    {
+        guesses: ["candy", "canny", "cabin", "cable", "comes", "camel"],
+        solution: "camel",
+    },
+    {
+        guesses: ["light", "might", "night", "nifty", "ninth", "ninny"],
+        solution: "ninny",
+    },
+    {
+        guesses: ["flame", "frame", "crane", "grape", "grate", "grace"],
+        solution: "grace",
+    },
+    {
+        guesses: ["cloud", "could", "would", "wound", "sound", "round"],
+        solution: "round",
+    },
+    {
+        guesses: ["pride", "bride", "gride", "glide", "slide", "slime"],
+        solution: "slime",
+    },
+    {
+        guesses: ["bloom", "blood", "brood", "broad", "bread", "break"],
+        solution: "break",
+    },
+];
 
-// purely visual class for wordle letters
-class WordleLetter {
-    letter: string;
-    color: WordleColor;
-    constructor(letter: string, color: WordleColor){
-        this.letter = letter;
-        this.color = color;
-    }
-}
+// type for each cell of the board
+type Cell = { letter: string; color: string };
 
-// returns WordleColor
-const checkIfInWord = (letter: string, word: string, posTyped: number) => {
-    const res = word.indexOf(letter);
-    if(res == -1) return WordleColor.Gray;
-    if(res == posTyped) return WordleColor.Green;
-    return WordleColor.Yellow;
-}
+// returns an array of wordleColors for a given string
+const getWordleColors = (guess: string, solution: string): WordleColor[] => {
+    // need to do two passes for duplicate letters
+    const result: WordleColor[] = Array(5).fill(WordleColor.Gray);
+    const solutionUsed = Array(5).fill(false);
 
-
-function Square({ color, letter, row, col }: { color: string; letter: string, row: number; col: number }) {
-    return (
-        <button
-            className="wordle-square leading-none flex items-center justify-center w-20 h-20 rounded-2xl text-white text-4xl font-extrabold"
-            style={{ backgroundColor: color, opacity: 0 }}
-            data-row={row.toString()}
-            data-col={col.toString()}
-        >
-        </button>
-    );
-}
-// function that returns a 2d matrix of a wordle board
-function genRandWordleColors(){
-    const mat: string[][] = [];
-    for(let i = 0; i < 6; i++){
-        mat[i] = [];
-        for(let j = 0; j < 5; j++){
-            // generate a random number on a per cell basis
-            let rand_int = Math.floor(Math.random() * 3);
-            console.log(rand_int)
-            mat[i][j] = COLORS[rand_int];
+    // check for exact matches
+    for (let i = 0; i < 5; i++) {
+        if (guess[i] === solution[i]) {
+            result[i] = WordleColor.Green;
+            solutionUsed[i] = true;
         }
     }
-    return mat;
+
+    // check for close matches
+    for (let i = 0; i < 5; i++) {
+        if (result[i] !== WordleColor.Gray) continue;
+        for (let j = 0; j < 5; j++) {
+            if (!solutionUsed[j] && guess[i] === solution[j]) {
+                result[i] = WordleColor.Yellow;
+                solutionUsed[j] = true;
+                break;
+            }
+        }
+    }
+
+    return result;
 }
 
+
+function Square({ cell, row, col }: { cell: Cell; row: number; col: number }) {
+    return (
+      <button  
+            className="wordle-square leading-none flex items-center justify-center w-20 h-20  text-white text-4xl font-extrabold"
+            data-row={row} data-col={col}
+          >
+            {cell.letter.toUpperCase()}
+          </button>
+        );
+}
+      
 // function that takes in a series of words representing a wordle solution
-// and generates a 2d matrix of colors representing it
-const genRealWordleColors = (words: string[], sol: string) => {
-    const mat: any[][] = [];
-    for(let i = 0; i < 6; i++){
-        // grab the current word on this row
-        let curWord = words[i];
+// and generates a 2d matrix of cells representing it
+const genRealWordleCells = (words: string[], sol: string): Cell[][] => {
+    const mat: Cell[][] = [];
+    for (let i = 0; i < 6; i++) {
+        const curWord = words[i];
+        const colorRow = getWordleColors(curWord, sol);
         mat[i] = [];
-        for(let j = 0; j < 5; j++){
-            // get the color of each letter
-            let color = checkIfInWord(curWord[j], sol, j);
-            mat[i][j] = [curWord[j], COLORS[color]];
+        for (let j = 0; j < 5; j++) {
+            mat[i][j] = { 
+                letter: curWord[j], 
+                color: COLORS[colorRow[j]]
+            };
         }
     }
     return mat;
+};
+
+function getRandBoard(){
+    let rand_int = Math.floor(Math.random() * fakeBoards.length);
+    let fakeBoard: any = fakeBoards[rand_int]
+    console.log(rand_int);
+    return fakeBoard;
 }
 
-function generateEmptyWordleBoard(): string[][] {
+// 6 x 5 matrix here
+function generateEmptyWordleBoard(): Cell[][] {
     return Array.from({ length: 6 }, () =>
-        Array.from({ length: 5 }, () => COLORS[WordleColor.White])
-    );
+        Array.from({ length: 5 }, () => ({ letter: "", color: COLORS[WordleColor.White]})
+    ));
 }
 
-export function WordleAnim(){
+export function WordleAnim() {
 
-    // creating our wordle state
-    const [wordleColors, setWordleColors] = useState<string[][]>(generateEmptyWordleBoard());
+    // state for the wordle board in the React DOM. start by generating an empty wordle board
+    const [board, setBoard] = useState<Cell[][]>(generateEmptyWordleBoard());
 
-    // creating a "fake" board state
-    // just using the first fake board from our fakeboards
-    const fakeStateRef = useRef<[string, string][][]>(
-        genRealWordleColors(fakeBoards[0].guesses, fakeBoards[0].solution)
-      );
+    // creating a references to these cells
+    const fakeStateRef = useRef<Cell[][]>([]);
 
-    useEffect(() => {
-        // just a simple stagger from gray to green
-        /*
-        animate('.wordle-square', {
-        backgroundColor: [COLORS[WordleColor.Gray], COLORS[WordleColor.Green]],
-        scale: [0.9, 1],
-        delay: stagger(100, { grid: [5, 6], from: 'first' }),
-        easing: 'easeInOutQuad'
-        });
-        */
-       const t1 = createTimeline({ 
-        loop: true,
-        onLoop: () => {
-            // near to clear the inline styles first
-            setWordleColors(generateEmptyWordleBoard());
-            fakeStateRef.current = genRealWordleColors(fakeBoards[0].guesses, fakeBoards[0].solution); // Use real words for now
-            document.querySelectorAll<HTMLElement>('.wordle-square').forEach(square => {
-              square.style.backgroundColor = '';
-              square.textContent = '';
+    // reference to the container of these cells
+    const containerRef = useRef<HTMLDivElement>(null);
+    
+    // whats important here is that GSAP is only responsible for animating the color, position and opacity
+    // not the innerText of the DOM elements themselves (letters) -- that'll be for React to handle
+    useGSAP(() => {
+        let tl: gsap.core.Timeline;
+
+        const createAnimation = () => {
+            // get the new board data
+            const fakeBoard = getRandBoard();
+            const cells = genRealWordleCells(fakeBoard.guesses, fakeBoard.solution);
+            fakeStateRef.current = cells;
+
+            // update the letters USING REACT, not GSAP
+            setBoard(prev => prev.map((row, i) => 
+                row.map((_, j) => ({
+                    letter: cells[i][j].letter,
+                    color: ""
+                }))
+            ));
+
+            // create a NEW timeline with fresh data reference
+            tl = gsap.timeline({
+                onComplete: createAnimation
             });
-          }
-    });
-    t1.add(
-        '.wordle-square',
-        {
-            backgroundColor: (el: any) => {
-                // animejs type defs expect the callback parameters
-                // to be of type AnimeTarget, which could be DOM, SVG, etc.
-                // so to help out TS i have to explicitly set it to HTMLElement
-                const element = el as HTMLElement
-                const row = parseInt(element.dataset.row!);
-                const col = parseInt(element.dataset.col!);
 
-                return fakeStateRef.current[row][col][1];
-            },
-            duration: 1000,
-            ease: 'inOut(6)',
-            // scale: 1.1,
-            delay: (el: any) => {
-                // custom delay for rows,
-                const element = el as HTMLElement;
-                const row = parseInt(element.dataset.row || '0');
-                const col = parseInt(element.dataset.col || '0');
-                
-                // 5000 per row (5 squares * 1000ms)
-                const rowDelay = row * 2500; 
-                const colDelay = col * 500;
-                
-                return rowDelay + colDelay;
-            },
-            // innerHTML field for our anim
-            innerHTML: (el: any) => {
-                const element = el as HTMLElement;
-                const row = parseInt(element.dataset.row!);
-                const col = parseInt(element.dataset.col!);
-                // because the letter is wrapped in a child div, we have to...
-                // change the whole div. alas!
-                return fakeStateRef.current[row][col][0].toUpperCase()
+            // finally, animate
+            tl.fromTo(".wordle-square", 
+                { y: -12, opacity: 0 },
+                {
+                    y: 0,
+                    opacity: 1,
+                    backgroundColor: (_i, target) => {
+                        const row = +(target as HTMLElement).dataset.row!;
+                        const col = +(target as HTMLElement).dataset.col!;
+                        return fakeStateRef.current[row][col].color;
+                    },
+                    duration: 0.5,
+                    stagger: { each: 0.1, from: "start" },
+                    ease: "power3.out"
+                }
+            );
 
-              },
-            // finally, make it visible
-            opacity: [0, 1],
-            scale: [0, 1],
-            rotate: ['180deg', '0deg']
-        }
-    );
+            // fade out
+            tl.to(".wordle-square", {
+                opacity: 0,
+                y: -24,
+                duration: 0.4,
+                stagger: { each: 0.1, from: "end" },
+                ease: "power3.in",
+                delay: 1
+            });
+        };
 
-    }, []);
+        // init animation creation
+        createAnimation();
+
+        // make sure tl is dead -- for sanity. i think gsap handles this but ill kill the anim here.
+        return () => {
+            tl?.kill(); // Cleanup
+        };
+    }, { scope: containerRef });
 
     return (
-        <>
-        <div className="flex flex-col">
-            <div className="flex flex-col gap-5 w-130 h-155 bg-gray-800 p-5 rounded-2xl">
-                {wordleColors.map((rowColors, row) => (
+        <div className="flex flex-col" ref={containerRef}>
+            <div className="wordle-board flex flex-col gap-5 w-130 h-155 bg-gray-800 p-5 rounded-2xl">
+                {/* mapping these divs to the board... */}
+                {board.map((rowCells, row) => (
                     <div key={row} className="wordle-row flex flex-row gap-5">
-                        {rowColors.map((color, col) => (
-                            <Square key={col} letter={''} color={color} row={row} col={col} />
+                        {rowCells.map((cell, col) => (
+                            <Square 
+                                key={col} 
+                                cell={cell} 
+                                row={row} 
+                                col={col} 
+                            />
                         ))}
                     </div>
                 ))}
@@ -195,6 +236,5 @@ export function WordleAnim(){
                 </label>
             </div>  
         </div>
-        </>
-    )
+    );
 }
