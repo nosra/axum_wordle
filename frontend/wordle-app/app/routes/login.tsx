@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import type { Route } from "./+types/login.ts";
 import { WordleAnim } from "~/wordle-anim/wordle-anim.js";
+import { gsap } from 'gsap'
 
 
 export function meta({}: Route.MetaArgs) {
@@ -61,7 +62,7 @@ export default function Login() {
                         </form>
                     </div>
                     <div className="flex rounded-2xl transition duration-300 ease-in-out hover:bg-green-700 text-white pt-3 pb-3 mt-5 w-70 justify-center bg-[#3cb53f]">
-                        <button className="w-full" onClick={handleLogin}>Continue</button>
+                        <button className="login__continue w-full" onClick={handleLogin}>Continue</button>
                     </div>
                     <div className="flex w-70 justify-start">
                         <a className="text-slate-400 mt-10 underline">Forgot Password?</a>
