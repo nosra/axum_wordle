@@ -1,14 +1,10 @@
 import { Link, Outlet } from "react-router";
-import { animate, createDraggable, createScope, JSAnimation, Scope } from 'animejs';
 import { useEffect, useRef } from "react";
 
 // this will just be put in the root of our react router application bg-[#7ab25b]
 export default function Navbar() {
   const root = useRef(null);
   const logoRef = useRef(null);
-
-   // ref for animations
-   const animationRef = useRef<JSAnimation | null>(null);
   
   return (
     <div ref={root}>

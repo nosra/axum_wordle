@@ -101,7 +101,7 @@ const getWordleColors = (guess: string, solution: string): WordleColor[] => {
 function Square({ cell, row, col }: { cell: Cell; row: number; col: number }) {
     return (
       <button  
-            className="wordle-square leading-none flex items-center justify-center w-20 h-20  text-white text-4xl font-extrabold"
+            className="wordle-square leading-none flex items-center justify-center w-20 h-20 text-white text-4xl font-extrabold"
             data-row={row} data-col={col}
           >
             {cell.letter.toUpperCase()}
@@ -155,7 +155,7 @@ export function WordleAnim() {
     // whats important here is that GSAP is only responsible for animating the color, position and opacity
     // not the innerText of the DOM elements themselves (letters) -- that'll be for React to handle
     useGSAP(() => {
-        let tl: gsap.core.Timeline;
+        let tl = gsap.timeline();
 
         const createAnimation = () => {
             // get the new board data
@@ -177,11 +177,24 @@ export function WordleAnim() {
             });
 
             // finally, animate
+            // start by animating the board coming in from the left
+            tl.fromTo(".wordle-board", {x: -1500},
+                {
+                    //rotate: 0,
+                    x: 0,
+                    // scale: 1,
+                    duration: 1.5,
+                    ease: "power1",
+                }
+            );
+
+            // individual squares
             tl.fromTo(".wordle-square", 
-                { y: -12, opacity: 0 },
+                { y: -12, opacity: 0, scale: 0, },
                 {
                     y: 0,
                     opacity: 1,
+                    scale: 1,
                     backgroundColor: (_i, target) => {
                         const row = +(target as HTMLElement).dataset.row!;
                         const col = +(target as HTMLElement).dataset.col!;
@@ -194,14 +207,26 @@ export function WordleAnim() {
             );
 
             // fade out
+            /*
             tl.to(".wordle-square", {
                 opacity: 0,
                 y: -24,
-                duration: 0.4,
-                stagger: { each: 0.1, from: "end" },
+                // duration: 0.4,
+                stagger: { each: 0.05, from: "end", },
                 ease: "power3.in",
-                delay: 1
+                // some delay for the user to look at this animation
+                delay: 0.2
             });
+            */
+
+            // move the wordle board itself
+            tl.to('.wordle-board', {
+                // rotate: -90,
+                x: 1500,
+                duration: 1.5,
+                ease: "power1.in",
+                // scale: 0,
+            })
         };
 
         // init animation creation
@@ -209,13 +234,13 @@ export function WordleAnim() {
 
         // make sure tl is dead -- for sanity. i think gsap handles this but ill kill the anim here.
         return () => {
-            tl?.kill(); // Cleanup
+            tl?.kill();
         };
     }, { scope: containerRef });
 
     return (
-        <div className="flex flex-col" ref={containerRef}>
-            <div className="wordle-board flex flex-col gap-5 w-130 h-155 bg-gray-800 p-5 rounded-2xl">
+        <div className="flex flex-col -z-1" ref={containerRef}>
+            <div className="wordle-board flex flex-col gap-5 w-130 h-155 rounded-2xl bg-gray-800 p-5">
                 {/* mapping these divs to the board... */}
                 {board.map((rowCells, row) => (
                     <div key={row} className="wordle-row flex flex-row gap-5">
