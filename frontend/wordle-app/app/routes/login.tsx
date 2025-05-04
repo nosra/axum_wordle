@@ -36,6 +36,9 @@ const handleLogin = async (e: any) => {
         ),
     })
     // TODO: do something with the response from the backend
+
+    // we should send the user to their timeline. for now,
+    // we will just send the user to the game page
 }
 
 export default function Login() {
