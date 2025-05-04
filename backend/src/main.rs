@@ -16,12 +16,11 @@ use dotenvy::dotenv;
 // custom entities
 use entity::user;
 
-// custom controllers
-
 // custom utils
 mod util;
-mod controllers;
 
+// custom controllers
+mod controllers;
 
 // testing functions for our db
 async fn debug_tests(db: &DatabaseConnection) -> Result<(), sea_orm::DbErr> {
