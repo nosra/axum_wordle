@@ -100,13 +100,15 @@ const getWordleColors = (guess: string, solution: string): WordleColor[] => {
 
 function Square({ cell, row, col }: { cell: Cell; row: number; col: number }) {
     return (
-      <button  
-            className="wordle-square leading-none flex items-center justify-center w-20 h-20 text-white text-4xl font-extrabold"
-            data-row={row} data-col={col}
-          >
+        <button  
+            className="wordle-square leading-none flex items-center justify-center 
+                      w-full h-full aspect-square text-3xl text-white font-extrabold"
+            data-row={row} 
+            data-col={col}
+        >
             {cell.letter.toUpperCase()}
-          </button>
-        );
+        </button>
+    );
 }
       
 // function that takes in a series of words representing a wordle solution
@@ -239,11 +241,11 @@ export function WordleAnim() {
     }, { scope: containerRef });
 
     return (
-        <div className="flex flex-col -z-1" ref={containerRef}>
-            <div className="wordle-board flex flex-col gap-5 w-130 h-155 rounded-2xl bg-gray-800 p-5">
+        <div className="flex flex-col -z-1 w-full h-full" ref={containerRef}>
+            <div className="wordle-board flex flex-col gap-2 w-full h-full bg-gray-800 p-4">
                 {/* mapping these divs to the board... */}
                 {board.map((rowCells, row) => (
-                    <div key={row} className="wordle-row flex flex-row gap-5">
+                    <div key={row} className="wordle-row grid grid-cols-5 gap-2 h-full">
                         {rowCells.map((cell, col) => (
                             <Square 
                                 key={col} 
