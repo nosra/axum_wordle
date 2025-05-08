@@ -13,6 +13,7 @@ pub struct Model {
     pub user_id: i32,
     #[sea_orm(column_type = "Blob")]
     pub data: Vec<u8>,
+    pub solution: String,
     pub in_progress: bool,
 }
 

@@ -64,6 +64,7 @@ async fn game_tests(db: &DatabaseConnection) -> Result<(), sea_orm::DbErr> {
         user_id: ActiveValue::Set(user.id),
         // data (vec for binary blobs)
         data: ActiveValue::Set(Vec::<u8>::new()),
+        solution: ActiveValue::Set("audio".into()),
         in_progress: ActiveValue::Set(true),
         ..Default::default()
     };
@@ -134,9 +135,12 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     // creating an app
     let app = Router::new()
-        .route("/api/", get(|| async { "Hello, World!"}))
+        .route("/api", get(|| async { "Hello, World!"}))
         .route("/api/user/login", post(controllers::user::login))
-        .route("/api/game/start", post(controllers::game::start))
+        .route("/api/game/create", post(controllers::game::create))
+        // .route("/api/game/{game_id}", post(controllers::game::enter))
+        .route("/api/game/{game_id}", get(controllers::game::get))
+        .route("/api/game/{game_id}/{guess}", post(controllers::game::check_guess))
         .with_state(shared_state)
         .layer(cors)
         .layer(session_layer)

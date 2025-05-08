@@ -242,10 +242,10 @@ export function WordleAnim() {
 
     return (
         <div className="flex flex-col -z-1 w-full h-full" ref={containerRef}>
-            <div className="wordle-board flex flex-col gap-2 w-full h-full bg-gray-800 p-4">
+            <div className="wordle-board flex flex-col gap-4 w-full h-full bg-gray-800 p-4">
                 {/* mapping these divs to the board... */}
                 {board.map((rowCells, row) => (
-                    <div key={row} className="wordle-row grid grid-cols-5 gap-2 h-full">
+                    <div key={row} className="wordle-row grid grid-cols-5 gap-4 h-full">
                         {rowCells.map((cell, col) => (
                             <Square 
                                 key={col} 

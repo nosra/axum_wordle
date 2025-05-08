@@ -9,6 +9,7 @@ enum Game {
     Id,
     UserId,
     Data,
+    Solution,
     InProgress,
 }
 
@@ -24,6 +25,7 @@ impl MigrationTrait for Migration {
                     .col(pk_auto(Game::Id))
                     .col(integer(Game::UserId))
                     .col(blob(Game::Data))
+                    .col(string(Game::Solution))
                     .col(boolean(Game::InProgress))
                     .to_owned(),
             )
