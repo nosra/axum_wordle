@@ -4,6 +4,7 @@ use axum::{
 use serde::Deserialize;
 use sea_orm::{ ActiveModelTrait, Database, DatabaseConnection };
 use serde_json::json;
+use tower_sessions::Session;
 
 // custom utils...
 use super::super::util;
@@ -12,20 +13,24 @@ use util::password;
 // custom entities
 use entity::user;
 
+// session constants
+use crate::USER_SESSION_KEY;
 
+// appstate
 use crate::AppState;
 
 #[derive(Deserialize)]
 #[derive(Debug)]
-pub struct CreateUser {
+pub struct LoginRequest {
     username: String,
     password: String,
 }
 
 #[axum::debug_handler]
-pub async fn post(
+pub async fn login(
     State(state): State<AppState>,
-    Json(payload): Json<CreateUser>,
+    session: Session,
+    Json(payload): Json<LoginRequest>,
     // alright, so in the case that we succesfully add the user to the database
     // im returning a type that implements IntoResponse (not necessarily an IntoResponse, just a type that... implements it)
 ) -> Result<impl IntoResponse, StatusCode> {
@@ -49,8 +54,11 @@ pub async fn post(
     })).map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
 
     // finally, insert the user
-    let _res: user::Model = new_user.insert(&db).await
+    let res: user::Model = new_user.insert(&db).await
         .map_err(|_| StatusCode::BAD_GATEWAY)?;
+
+    // then -- set the session to this user
+    session.insert(USER_SESSION_KEY, res.id).await.map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
 
     Ok(StatusCode::ACCEPTED)
 }
