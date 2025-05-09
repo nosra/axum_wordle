@@ -24,7 +24,8 @@ impl MigrationTrait for Migration {
                     .if_not_exists()
                     .col(pk_auto(Game::Id))
                     .col(integer(Game::UserId))
-                    .col(blob(Game::Data))
+                    // originally blob
+                    .col(var_binary(Game::Data, 30))
                     .col(string(Game::Solution))
                     .col(boolean(Game::InProgress))
                     .to_owned(),
