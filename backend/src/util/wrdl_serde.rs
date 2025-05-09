@@ -3,8 +3,8 @@ use serde::Deserialize;
 
 #[derive(Serialize, Deserialize, Copy, Clone)]
 pub struct Cell {
-    letter: char,
-    color: char,
+    pub letter: char,
+    pub color: char,
 }
 
 // use the offset of a to convert
@@ -54,6 +54,18 @@ fn gen_bin_cell(color: u8, letter: u8) -> u8 {
 
 fn convert_to_wint(wordle_letters: [Cell; 30]) -> [u8; 30] {
     let mut storage = [0u8; 30];
+    for (i, &cell) in wordle_letters.iter().enumerate() {
+        let color: u8 = wc_to_2bit(cell.color);
+        let letter: u8 = char_to_5bit(cell.letter).unwrap();
+        let bin_cell = gen_bin_cell(color, letter);
+        // println!("{:#b}", bin_cell);
+        storage[i] = bin_cell;
+    }
+    storage
+}
+
+pub fn convert_guess_to_wint(wordle_letters: [Cell; 5]) -> [u8; 5] {
+    let mut storage = [0u8; 5];
     for (i, &cell) in wordle_letters.iter().enumerate() {
         let color: u8 = wc_to_2bit(cell.color);
         let letter: u8 = char_to_5bit(cell.letter).unwrap();

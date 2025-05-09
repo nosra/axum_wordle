@@ -190,10 +190,15 @@ export default function WordleGame({ params,}: Route.ComponentProps) {
                 const data = await res.json();
 
                 // changing null chars to blank letters
-                const cleaned = data.board.map((cell: { letter: string; color: any; }) => ({
+                const cleaned = data.board.map((cell: { letter: string; color: any; }, index: any) => ({
                     letter: cell.letter === '\u0000' ? '' : cell.letter,
                     color: cell.color
                 }));
+
+                // set the cursor to the last non-null character
+                const lastFilledIndex = cleaned.findLastIndex((cell: { letter: string; color: any; }) => cell.letter !== '');
+                setCursor(lastFilledIndex + 1);
+                setCurrentRow(Math.floor((lastFilledIndex + 1) / 5));
 
                 // chunk the cleaned board into rows of 5
                 const chunked = [];
