@@ -61,7 +61,7 @@ export function UserGameList() {
     return (
         <>
         <div className="board-container bg-[#eeeeee] h-screen flex flex-col">
-            <div className="board-list flex-1 grid grid-cols-3 gap-x-5 gap-y-5 p-5 min-w-max overflow-auto overflow-x-hidden mb-15">
+            <div className="board-list flex-1 grid md:grid-cols-2 grid-cols-3 gap-x-5 gap-y-5 p-5 min-w-max overflow-auto overflow-x-hidden mb-15">
                 {/* TODO: query the database for a list of all games */}
                 {boardList?.map((board, boardNum) => (
                     <div key={boardNum} 
