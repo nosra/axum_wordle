@@ -1,4 +1,5 @@
 import { UserSideBar } from "app/usersidebar/usersidebar";
+import { UserGameList } from "app/usergamelist/usergamelist";
 
 export default function UserHome(){
     return(
@@ -6,8 +7,9 @@ export default function UserHome(){
         {/* should have a list of previous games, ongoing games, option to create a new game
         at some point I could implement a stats bar for... stats. How good you are compared to other players
         (like minimal guesses, etc.)  */}
-            <div className="main-container">
+            <div className="main-container flex flex-row h-full">
                 <UserSideBar/>
+                <UserGameList/>
             </div>
         </>
     )
