@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import type { Route } from "./+types/login.ts";
-import { WordleAnim } from "~/wordle-anim/wordle-anim.js";
+import { WordleAnim } from "app/wordle-anim/wordle-anim.js";
 import { gsap } from 'gsap'
 
 
