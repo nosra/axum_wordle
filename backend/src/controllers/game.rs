@@ -3,7 +3,7 @@ use std::vec;
 use axum::{
     body::{Body, Bytes}, extract::{Json, Request, State, Path}, http::StatusCode, response::IntoResponse, Router
 };
-use sea_orm::{ ActiveModelTrait, ActiveValue, DatabaseConnection, EntityTrait, QueryFilter, ColumnTrait };
+use sea_orm::{ ActiveModelTrait, ActiveValue::{self, Set}, ColumnTrait, DatabaseConnection, EntityTrait, QueryFilter };
 use serde::{Deserialize, Serialize};
 use tower_sessions::Session;
 use crate::{util::wrdl_serde, AppState, USER_SESSION_KEY};
@@ -168,7 +168,34 @@ pub async fn check_guess(
     .await
     .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
 
+    // grab the model
+    let game_model = game.unwrap();
+
     // return the checked guess
-    let checked_guess = get_colors(path.guess.to_ascii_lowercase(), game.unwrap().solution);
+    let checked_guess = get_colors(path.guess.to_ascii_lowercase(), game_model.clone().solution);
+
+    // also, update the data of the game to reflect the guess. (data is an array of u8)
+    let mut updated_game: game::ActiveModel = game_model.clone().into();
+    
+    // convert the checkguesses to cells
+    let guess_chars: Vec<char> = path.guess.to_ascii_lowercase().chars().collect();
+    let cells: [wrdl_serde::Cell; 5] = std::array::from_fn(|i| wrdl_serde::Cell {
+        letter: guess_chars[i],
+        color: checked_guess.checks[i],
+    });
+
+    // append the guess to the existing data of the board
+    let wint_data = wrdl_serde::convert_guess_to_wint(cells);
+
+    // unwrap the current Vec<u8>
+    let mut new_data = updated_game.data.unwrap(); 
+    new_data.extend_from_slice(&wint_data);
+    updated_game.data = Set(new_data);
+
+    // SQL update
+    let _: game::Model = updated_game.update(&db)
+    .await
+    .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
+    
     Ok(Json(checked_guess))
 }

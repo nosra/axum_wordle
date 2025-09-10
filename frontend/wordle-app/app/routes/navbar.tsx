@@ -9,13 +9,12 @@ export default function Navbar() {
   return (
     <div ref={root}>
       <div className="navbar h-16 flex flex-row pl-10 items-center bg-black gap-10 p-5">
-        {/* Your navbar links here */}
         <img ref={logoRef} className="logo rustle h-10 w-10" src="/letter-r.png"></img>
         <div>
           <Link className="navbar__link text text-white" to="/login">Login</Link>
         </div>
         <div>
-          <Link className="navbar__home text text-white" to="/">Home</Link>
+          <Link className="navbar__home text text-white" to="/userhome">Home</Link>
         </div>
       </div>
     </div>
