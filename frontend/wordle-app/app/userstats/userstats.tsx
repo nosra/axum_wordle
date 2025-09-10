@@ -7,8 +7,8 @@ export function UserStats() {
                     {/* TODO: make this LABEL be the current user's name*/}
                     <label className="name text-white text-5xl font-bold">Hello, Carson</label>
                 </div>
-                <div className="master_container flex flex-row h-full w-full space-x-5 bg-red-500 mb-5">
-                    <div className="left_container flex-none flex flex-col w-1/2 h-full bg-amber-500">
+                <div className="master_container flex flex-row h-full w-full space-x-5 mb-5">
+                    <div className="left_container flex-none flex flex-col w-1/2 h-full ">
                         <div className="stats_container flex-[2] flex-col rounded-3xl border-2 border-gray-200 bg-white mb-5">
                             <div className="stats-title pl-5 pt-5">
                                 <label className="text-green-500 text-2xl font-bold">
@@ -46,7 +46,7 @@ export function UserStats() {
                         <div className="badges_container flex-1 rounded-3xl border-2 border-gray-200 bg-white">
                         </div>
                     </div>
-                    <div className="right_container flex-none flex flex-col w-1/2 h-full bg-blue-500">
+                    <div className="right_container flex-none flex flex-col w-1/2 h-full ">
                         <div className="streak_container flex-1 rounded-3xl border-2 border-gray-200 bg-white mb-5">
                         </div>
                         <div className="leaderboard_container flex-[2] rounded-3xl border-2 border-gray-200 bg-white">

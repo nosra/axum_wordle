@@ -17,9 +17,10 @@ function Square({ cell, row, col }: { cell: Cell; row: number; col: number }) {
     }[cell.color];
     return (
         <button  
-            className={`wordle-square leading-none flex items-center justify-center 
-                w-10 h-10 rounded-sm ${bgColor} shrink-0 text-3xl text-white font-extrabold
-                m-0 p-0 box-border`}  // Crucial box-model reset
+        className={`wordle-square flex items-center justify-center 
+            w-full aspect-square min-w-[25px] min-h-[25px] rounded-sm
+             ${bgColor} 
+            leading-none text-white font-extrabold box-border`}
             data-row={row} 
             data-col={col}
         >
@@ -60,26 +61,20 @@ export function UserGameList() {
 
     return (
         <>
-        <div className="board-container bg-[#eeeeee] h-[calc(100vh-60px)] w-400 overflow-auto overflow-x-hidden">
-            <div className="board-list flex-1 grid 3xl:grid-cols-3 grid-cols-2 gap-x-5 gap-y-5 p-5 min-w-max">
+        <div className="board-container bg-[#eeeeee] h-[calc(100vh-60px)] w-full overflow-auto overflow-x-hidden">
+            <div className="board-list grid grid-cols-2 [@media(max-width:1180px)]:grid-cols-1 gap-4 p-4">
                 {/* TODO: query the database for a list of all games */}
                 {boardList?.map((board, boardNum) => (
-                    <div key={boardNum} 
-                        className="board grid bg-[#d9d9d9] border-2 border-[#9E9E9E] p-5 gap-3"
-                    >
-                        {board.cells.map((rowCells, row) => (
-                            <div key={row} className="flex gap-3">
-                            {rowCells.map((cell, col) => (
-                                <Square 
-                                    key={col} 
-                                    cell={cell} 
-                                    row={row} 
-                                    col={col} 
-                                />
-                            ))}
-                        </div>
-                        ))}
+                    <div key={boardNum} className="board bg-[#d9d9d9] border-2 border-[#9E9E9E] p-4">
+                    <div className="grid grid-cols-5 gap-3 w-full">
+                      {board.cells.map((rowCells, row) =>
+                        rowCells.map((cell, col) => (
+                          <Square key={`${row}-${col}`} cell={cell} row={row} col={col} />
+                        ))
+                      )}
                     </div>
+                  </div>
+                  
                 ))
                 }
             </div>
