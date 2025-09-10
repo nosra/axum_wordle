@@ -65,7 +65,7 @@ export default function Login() {
                     </form>
                 </div>
             {/* wordle demo anim */}
-            <div className="demo flex flex-col justify-center items-center w-full">
+            <div className="demo flex flex-col justify-center items-center w-full mb-20">
                 <div className="demo__splash-test flex justify-center mb-4">
                     <label className="text-white text-2xl md:text-3xl lg:text-4xl">
                         Play millions of Rustle Boards!

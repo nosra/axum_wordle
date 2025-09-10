@@ -9,7 +9,7 @@ import friendsIcon from './friends.svg';
 export function UserSideBar() {
     return (
         <>
-            <div className="sidebar flex flex-col justify-start gap-y-5 bg-black w-60 h-full border-t-gray-500 border-2">
+            <div className="sidebar flex flex-col justify-start gap-y-5 bg-black min-w-60 h-full border-t-gray-500 border-2">
                 <div className="sidebar__game flex flex-col gap-5 pl-5 pr-5 border-b-2 border-gray-500">
                     <div className="mt-5 pill pill__ongoing">
                         <div className="pill__items flex flex-row items-center gap-5 align-middle rounded-3xl pt-4 pb-4 border-gray-500 border-[1px]">
